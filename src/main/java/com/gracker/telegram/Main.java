@@ -283,7 +283,6 @@ public class Main {
 
     private static int sendMessageUserEx(int uid, String message) {
         String peer_cmd = "msg user#" + uid + " " + message;
-        int res = sendMessageCommon(peer_cmd);
         return sendMessageCommon(peer_cmd);
     }
 
