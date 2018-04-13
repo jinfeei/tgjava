@@ -40,3 +40,13 @@ msg_status int(11) NOT NULL DEFAULT '0',
 msg_date timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
 PRIMARY KEY (msg_id)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci AUTO_INCREMENT=1 ;
+
+To send a message out, insert an entry into the outgoing table. E.g.
+
+INSERT outgoing (msg_phone, msg_text) VALUES ('60121010101', 'This is a test message.')
+
+To send a chat group message, please add the telegram phone number into the group and then send a message 'identify' to this chat group. You shall receive an id identifying the group. If the group id is 12345 for example, just prefix 'g' in front:
+
+INSERT outgoing (msg_phone, msg_text) VALUES ('g12345', 'This is a test chat message.')
+
+Incoming messages are stored into the incoming table. 
