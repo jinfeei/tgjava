@@ -1,0 +1,21 @@
+version: "3.2"
+services:
+  telegram:
+    container_name: telegram
+    image: jinfeei/tgjava
+    #logging:
+    #  driver: syslog
+    #  options:
+    #    syslog-address: "udp://localhost:12201"
+    restart: always
+    environment:
+      MYSQL_HOST: 172.17.0.1
+      TG_HOST: 172.17.0.1
+      ADMIN_PHONE: 60124093123
+      MYSQL_USER: telegram_user
+      MYSQL_PASSWORD: d08080e
+    ports:
+      - "4458:4458"
+    volumes:
+      - "./key:/root/.telegram-cli"
+      
