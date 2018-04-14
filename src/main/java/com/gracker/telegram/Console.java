@@ -24,7 +24,7 @@ public class Console implements Runnable {
     {
         started = false;
         try {
-            String tg_cmd = "/usr/bin/telegram-cli -k /etc/telegram-cli/tg.pub -P 4458 -W --json --accept-any-tcp --disable-readline";
+            String tg_cmd = "/usr/bin/telegram-cli -k /etc/telegram-cli/tg.pub -P 4458 -W -C --json --accept-any-tcp --disable-readline";
 
             proc = Runtime.getRuntime().exec(tg_cmd);
             System.out.println("telegram-cli started: " + tg_cmd);
@@ -39,22 +39,37 @@ public class Console implements Runnable {
         }
     }
 
-    private void doJson(String s){
+    private boolean doJson(String s){
         JSONObject object = null;
 
-        Object obj = new JSONTokener(s).nextValue();
-        if (obj instanceof JSONObject)
-        {
-            object = (JSONObject) obj;
-        }
-        else if (obj instanceof JSONArray)
-        {
-            if (((JSONArray) obj).length() == 0){
-                return;
+        Object obj;
+        try {
+            obj = new JSONTokener(s).nextValue();
+            if (obj == null) return false;
+
+            if (obj instanceof JSONObject)
+            {
+                object = (JSONObject) obj;
+            }
+            else if (obj instanceof JSONArray)
+            {
+                if (((JSONArray) obj).length() == 0){
+                    return false;
+                }
+
+                object = ((JSONArray) obj).getJSONObject(0);
             }
 
-            object = ((JSONArray) obj).getJSONObject(0);
+            if (object == null)
+                return false;
+
+            if (!object.has("from") || !object.has("to")){
+                return false;
+            }
+        } catch (Exception e) {
+            return false;
         }
+
 
         JSONObject jsonFrom = object.getJSONObject("from");
         JSONObject jsonTo = object.getJSONObject("to");
@@ -67,7 +82,13 @@ public class Console implements Runnable {
         String ttype = jsonTo.getString("type");
         String tphone;
 
-        String message = object.getString("text");
+        String message;
+
+        if (object.has("text")) {
+            message = object.getString("text");
+        } else {
+            message = s;
+        }
 
         if (ttype.equals("chat")) {
             tphone = jsonTo.getString("title");
@@ -76,10 +97,9 @@ public class Console implements Runnable {
             if (message.trim().toLowerCase().startsWith("iden")) {
                 System.out.println("IDEN received from: " + fphone);
                 OutgoingDao odao = new OutgoingDao();
-                //odao.insertMessage(fphone, "Group ID: " + tid + " Group Title: " + tphone);
                 odao.insertMessage("g" + tid, "Group ID:" + tid + " Group Title:" + tphone + " (Requested by:" + fphone + ")");
             }
-        } else {
+        } else if (ttype.equals("user")){
             tphone = jsonTo.getString("phone");
             System.out.println("*** MSG  fr:" + fphone + " to:" + tphone + " id:" + tid + " msg:" + message);
 
@@ -88,10 +108,16 @@ public class Console implements Runnable {
                 OutgoingDao odao = new OutgoingDao();
                 odao.insertMessage(fphone, "IDEN: your ID: " + fid + " my ID: " + tid);
             }
+        } else {
+            System.out.println("*** Other type: " + ttype);
+            System.out.println("json: " + s);
         }
+
         Incoming msg = new Incoming(tid, msg_id, fphone, message);
         IncomingDao idao = new IncomingDao();
         idao.insert(msg);
+
+        return true;
     }
 
     @Override
@@ -112,9 +138,10 @@ public class Console implements Runnable {
                 if (tgin.ready() && (s = tgin.readLine()) != null) {
                     workdone = true;
 
-                    if (s.startsWith("{") || s.startsWith("[{")) {
-                        System.out.println("json: " + s);
-                        doJson(s);
+                    if (doJson(s)) {
+                        if (Main.DEBUG_MODE) {
+                            System.out.println("json: " + s);
+                        }
                     } else {
                         System.out.println("console: " + s);
                     }
@@ -123,7 +150,6 @@ public class Console implements Runnable {
             catch (Exception e) {
                 System.out.println("Exception in Console loop...");
                 e.printStackTrace();
-                break;
             }
 
             try {

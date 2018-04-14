@@ -8,8 +8,6 @@ import org.json.JSONTokener;
 import java.io.*;
 import java.net.InetAddress;
 import java.net.Socket;
-import java.nio.charset.Charset;
-import java.nio.charset.StandardCharsets;
 import java.util.List;
 
 import java.io.IOException;
@@ -17,21 +15,21 @@ import java.util.regex.Pattern;
 
 /**
  * Created by lohjinfeei on 06/04/2018.
- *
- * Reference for JSON: https://www.tutorialspoint.com/json/json_java_example.htm
- *
  */
 
 public class Main {
 
     private static PrintWriter out;
     private static BufferedReader in;
-    private static String ADMIN_PHONE;
+
+    public static String ADMIN_PHONE;
+    public static boolean DEBUG_MODE;
+    public static String TG_HOST;
 
     public static void main(String[] args) throws IOException, InterruptedException{
 
         System.out.println("================================================");
-        System.out.println("    Telegram Client Ver 1.03 (12 April 2018)");
+        System.out.println("    Telegram Client Ver 1.07 (14 April 2018)");
         System.out.println("================================================");
 
         System.out.println("MYSQL_HOST : " + System.getenv("MYSQL_HOST"));
@@ -42,12 +40,17 @@ public class Main {
         System.out.println("TG_HOST : " + System.getenv("TG_HOST"));
         System.out.println();
         System.out.println("ADMIN_PHONE : " + System.getenv("ADMIN_PHONE"));
+        System.out.println("DEBUG_MODE : " + System.getenv("ADMIN_PHONE"));
         System.out.println();
         System.out.println("================================================");
 
         //Docker localhost =  "172.17.0.1"
-        String TG_HOST = System.getenv("TG_HOST") == null ? "127.0.0.1" : System.getenv("TG_HOST");
+        TG_HOST = System.getenv("TG_HOST") == null ? "127.0.0.1" : System.getenv("TG_HOST");
         ADMIN_PHONE = System.getenv("ADMIN_PHONE");
+        DEBUG_MODE = System.getenv("DEBUG_MODE") == null ? false : System.getenv("DEBUG_MODE").toLowerCase().equals("true") ? true : false;
+
+        if (DEBUG_MODE)
+            System.out.println("Debug mode: true");
 
         new Thread(new Console()).start();
 
@@ -168,7 +171,8 @@ public class Main {
                     }
                     else if (s.startsWith("[{") || s.startsWith("{"))
                     {
-                        System.out.println("json: " + s);
+                        if (DEBUG_MODE)
+                            System.out.println("json: " + s);
 
                         JSONObject object = null;
 
