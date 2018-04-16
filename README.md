@@ -4,9 +4,9 @@ This is a program running in docker using telegram-cli to send/receive messages 
 
 To register a new phone, please run:
 
-docker run -it -v key:/root/.telegram-cli b3vis/telegram-cli
+docker run -it -v /path/to/myconfig:/root/.telegram-cli b3vis/telegram-cli
 
-"key" is a directory to keep telegram-cli config or session.
+/path/to/myconfig is a directory to keep telegram-cli config or session. Please use the same directory in docker-compose.yml.
 
 After that we may run the program using "docker-compose up -d" using the docker-compose.yml file in the docker folder.
 
