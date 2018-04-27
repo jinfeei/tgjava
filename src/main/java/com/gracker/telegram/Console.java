@@ -95,7 +95,7 @@ public class Console implements Runnable {
             System.out.println("*** CHAT fr:" + fphone + " to:" + tphone + " id:" + tid + " msg:" + message);
 
             if (message.trim().toLowerCase().startsWith("iden")) {
-                System.out.println("IDEN received from: " + fphone);
+                System.out.println("***IDEN received from: " + fphone);
                 OutgoingDao odao = new OutgoingDao();
                 odao.insertMessage("g" + tid, "Group ID:" + tid + " Group Title:" + tphone + " (Requested by:" + fphone + ")");
             }
@@ -104,9 +104,9 @@ public class Console implements Runnable {
             System.out.println("*** MSG  fr:" + fphone + " to:" + tphone + " id:" + tid + " msg:" + message);
 
             if (message.trim().toLowerCase().startsWith("iden")) {
-                System.out.println("IDEN received from: " + fphone);
+                System.out.println("***IDEN received from: " + fphone);
                 OutgoingDao odao = new OutgoingDao();
-                odao.insertMessage(fphone, "IDEN: your ID: " + fid + " my ID: " + tid);
+                odao.insertMessage(fphone, "***IDEN: your ID: " + fid + " my ID: " + tid);
             }
         } else {
             System.out.println("*** Other type: " + ttype);

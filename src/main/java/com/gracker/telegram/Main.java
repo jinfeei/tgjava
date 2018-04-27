@@ -29,7 +29,7 @@ public class Main {
     public static void main(String[] args) throws IOException, InterruptedException{
 
         System.out.println("================================================");
-        System.out.println("    Telegram Client Ver 1.07 (14 April 2018)");
+        System.out.println("    Telegram Client Ver 1.08 (24 April 2018)");
         System.out.println("================================================");
 
         System.out.println("MYSQL_HOST : " + System.getenv("MYSQL_HOST"));
